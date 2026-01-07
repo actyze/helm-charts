@@ -1,0 +1,42 @@
+# Helm
+*.tgz
+charts/
+Chart.lock
+
+# Secrets - NEVER commit these!
+*-secrets.yaml
+!*-secrets.yaml.template
+*secret*.yaml
+!*secret*.yaml.template
+.env
+.env.*
+!.env.example
+
+# Rendered templates
+output.yaml
+rendered/
+*.rendered.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Local development
+local-values.yaml
+my-values.yaml
+test-values.yaml
+
