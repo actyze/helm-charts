@@ -99,7 +99,7 @@ nexus:
   image:
     repository: actyze/dashboard-nexus  # Public DockerHub image
     tag: main-llm-flex  # Flexible LLM authentication
-    pullPolicy: IfNotPresent  # Use locally loaded image for Kind
+    pullPolicy: Always  # Always pull latest from DockerHub
   service:
     type: ClusterIP
     port: 8002
@@ -170,24 +170,53 @@ frontend:
 # Ingress configuration
 ingress:
   enabled: true
-  className: "nginx"
+  className: "nginx"  # Change to your ingress controller (e.g., "traefik", "haproxy", "alb")
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    # cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Disabled for local dev
+    # SSL/TLS Configuration
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Automatic SSL certificates
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # Request limits
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"  # For large file uploads
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    
+    # 🔒 Security Headers - Prevent search engine indexing and crawling
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+      add_header X-Frame-Options "DENY" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header Referrer-Policy "no-referrer" always;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    
+  # 🌐 Custom Domain Configuration
   hosts:
-    - host: dashboard.local  # Local Kind cluster access
+    - host: demo.actyze.ai  # Production domain
       paths:
-        - path: /
+        - path: /          # Frontend UI
           pathType: Prefix
           service: frontend
-        - path: /api
+        - path: /api       # Backend API
           pathType: Prefix
           service: nexus
-  tls: []  # Disabled for local development
-    # - secretName: dashboard-tls  # Enable for production
-    #   hosts:
-    #     - dashboard.actyze.com
+  
+  # 🔒 TLS/SSL Configuration
+  # Enable for HTTPS with automatic certificates from cert-manager
+  tls:
+    - secretName: demo-actyze-ai-tls
+      hosts:
+        - demo.actyze.ai
+  
+  # 📝 For cert-manager automatic SSL:
+  # 1. Ensure cert-manager is installed in your cluster
+  # 2. Uncomment the cert-manager annotation below
+  # 3. Update your DNS: demo.actyze.ai → [your-ingress-ip]
+  
+  # For local testing, use:
+  # hosts:
+  #   - host: dashboard.local
+  # tls: []
 
 # Service Monitor for Prometheus (optional)
 serviceMonitor:
