@@ -24,10 +24,20 @@ spec:
         image: "{{ .Values.schemaService.image.repository }}:{{ .Values.schemaService.image.tag }}"
         imagePullPolicy: {{ .Values.schemaService.image.pullPolicy | default .Values.global.imagePullPolicy }}
         env:
+        # Schema Service Authentication
+        {{- if .Values.schemaService.env.schemaServiceKey }}
+        - name: SCHEMA_SERVICE_KEY
+          value: {{ .Values.schemaService.env.schemaServiceKey | quote }}
+        {{- end }}
+        # Trino Configuration
         - name: TRINO_HOST
           value: "{{ .Values.schemaService.env.trino.host }}"
         - name: TRINO_PORT
           value: "{{ .Values.schemaService.env.trino.port }}"
+        - name: TRINO_CATALOG
+          value: "{{ .Values.schemaService.env.trino.catalog }}"
+        - name: TRINO_SCHEMA
+          value: "{{ .Values.schemaService.env.trino.schema }}"
         - name: TRINO_USER
           valueFrom:
             secretKeyRef:
@@ -42,6 +52,23 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "dashboard.fullname" . }}-trino-credentials
+              key: password
+        # PostgreSQL Configuration (for fetching table descriptions)
+        - name: POSTGRES_HOST
+          value: "{{ include "dashboard.fullname" . }}-postgres"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          value: "{{ .Values.postgres.database }}"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "dashboard.fullname" . }}-postgres-credentials
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "dashboard.fullname" . }}-postgres-credentials
               key: password
         - name: SCHEMA_REFRESH_HOURS
           value: "{{ .Values.schemaService.env.refreshHours }}"

@@ -1,16 +1,18 @@
 apiVersion: v2
 name: dashboard
-description: A Helm chart for Dashboard application with dual-model ML backend
+description: AI-powered analytics dashboard with Natural Language to SQL conversion
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
 keywords:
   - dashboard
-  - ml
-  - codet5
+  - ai
+  - nlp
+  - sql
+  - analytics
   - trino
-  - spring-boot
+  - fastapi
   - react
 
 maintainers:

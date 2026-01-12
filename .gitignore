@@ -6,8 +6,8 @@ Chart.lock
 # Secrets - NEVER commit these!
 *-secrets.yaml
 !*-secrets.yaml.template
-*secret*.yaml
-!*secret*.yaml.template
+values-secrets.yaml
+!values-secrets.yaml.template
 .env
 .env.*
 !.env.example
@@ -23,6 +23,7 @@ rendered/
 *.swp
 *.swo
 *~
+*.code-workspace
 .DS_Store
 
 # Temporary files

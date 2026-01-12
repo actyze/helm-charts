@@ -2,10 +2,11 @@
 
 ## Configuration Files
 
-We now have **TWO** clean configuration files:
+We now have a **unified configuration** approach:
 
-1. **`values-dev.yaml`** - Development environment (local Kind cluster)
-2. **`values-production.yaml`** - Production environment (Azure AKS)
+1. **`values.yaml`** - Main configuration (works for all environments)
+2. **`values-secrets.yaml`** - Your secrets (gitignored, environment-specific)
+3. **`values-secrets.yaml.template`** - Template for setting up secrets
 
 ## Docker Hub Setup (Private Registry)
 
@@ -14,16 +15,17 @@ We now have **TWO** clean configuration files:
 ### Quick Setup
 
 **1. Replace Docker Hub username in both values files:**
-```bash
-# Replace "yourusername" with your actual Docker Hub username
-sed -i '' 's/yourusername/YOUR_DOCKERHUB_USERNAME/g' helm/dashboard/values-dev.yaml
-sed -i '' 's/yourusername/YOUR_DOCKERHUB_USERNAME/g' helm/dashboard/values-production.yaml
-```
+**Note:** The unified values.yaml now uses public DockerHub images from the `actyze` organization:
+- `actyze/dashboard-nexus:latest`
+- `actyze/dashboard-frontend:latest`
+- `actyze/dashboard-schema-service:latest`
+
+No private registry setup required!
 
 **2. Create private repositories on Docker Hub:**
 - Go to https://hub.docker.com/repositories
 - Create 3 private repositories:
-  - `dashboard-backend`
+  - `dashboard-nexus`
   - `dashboard-frontend`
   - `dashboard-schema-service`
 
@@ -35,16 +37,16 @@ export DOCKERHUB_USERNAME="your-username"
 # Login to Docker Hub
 docker login
 
-# Build and push backend
-docker build -f docker/Dockerfile.backend -t ${DOCKERHUB_USERNAME}/dashboard-backend:latest .
-docker push ${DOCKERHUB_USERNAME}/dashboard-backend:latest
+# Build and push nexus
+docker build -f nexus/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-nexus:latest .
+docker push ${DOCKERHUB_USERNAME}/dashboard-nexus:latest
 
 # Build and push frontend
-docker build -f docker/Dockerfile.frontend -t ${DOCKERHUB_USERNAME}/dashboard-frontend:latest .
+docker build -f frontend/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-frontend:latest .
 docker push ${DOCKERHUB_USERNAME}/dashboard-frontend:latest
 
 # Build and push schema service
-docker build -f docker/Dockerfile.schema-service -t ${DOCKERHUB_USERNAME}/dashboard-schema-service:latest .
+docker build -f schema-service/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-schema-service:latest .
 docker push ${DOCKERHUB_USERNAME}/dashboard-schema-service:latest
 ```
 
@@ -82,13 +84,13 @@ helm upgrade --install dashboard ./helm/dashboard \
 **Every time you build a new image, just push it:**
 ```bash
 # Build new version
-docker build -f docker/Dockerfile.backend -t ${DOCKERHUB_USERNAME}/dashboard-backend:latest .
+docker build -f nexus/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-nexus:latest .
 
 # Push to Docker Hub (overwrites latest tag)
-docker push ${DOCKERHUB_USERNAME}/dashboard-backend:latest
+docker push ${DOCKERHUB_USERNAME}/dashboard-nexus:latest
 
 # Restart pods to pull new image
-kubectl rollout restart deployment dashboard-backend -n dashboard
+kubectl rollout restart deployment dashboard-nexus -n dashboard
 ```
 
 **Helm values never need updating!** The `latest` tag and `pullPolicy: Always` ensure fresh images every time.
@@ -113,95 +115,48 @@ modelStrategy:
 - ✅ Pay-per-use pricing
 - ✅ Instant updates to newer models
 
-### Option 2: Local Phi-4 LoRA Model
-```yaml
-modelStrategy:
-  phiSqlLora:
-    enabled: true           # ← Set to true to use self-hosted model
-    replicas: 1
-    resources:
-      memory: "8Gi"
-      cpu: "2000m"
-```
-
-**Benefits:**
-- ✅ No API costs
-- ✅ Complete data privacy
-- ✅ No external dependencies
-- ❌ Requires 8Gi+ RAM per replica
-
 ## Optional Services
 
 All services can be toggled in the `services` section:
 
 ```yaml
 services:
-  backend:
+  nexus:
     enabled: true        # REQUIRED - core orchestration
   frontend:
-    enabled: true        # Optional - can disable for API-only
+    enabled: true        # REQUIRED - web interface
   schemaService:
-    enabled: true        # Recommended - improves SQL quality
+    enabled: true        # REQUIRED - improves SQL quality
+  postgres:
+    enabled: true        # REQUIRED - operational database
   trino:
-    enabled: true        # Required - for query execution
-  demo:
-    enabled: true        # Dev only - sample databases
+    enabled: true        # REQUIRED - query execution
 ```
 
 ## Deployment Commands
 
-### Development (local Kind cluster)
+### All Environments (Dev, Staging, Production)
 ```bash
-helm install dashboard ./helm/dashboard \
-  --namespace dashboard \
-  --create-namespace \
-  --values helm/dashboard/values-dev.yaml
-```
+# 1. Create secrets file from template
+cp helm/dashboard/values-secrets.yaml.template helm/dashboard/values-secrets.yaml
+# Edit values-secrets.yaml with your credentials
 
-### Production (Azure AKS)
-```bash
+# 2. Deploy
 helm install dashboard ./helm/dashboard \
   --namespace dashboard \
   --create-namespace \
-  --values helm/dashboard/values-production.yaml \
-  --set modelStrategy.externalLLM.apiKey=${EXTERNAL_LLM_API_KEY}
+  --values helm/dashboard/values.yaml \
+  --values helm/dashboard/values-secrets.yaml
 ```
 
 ## Upgrading Configuration
 
 ```bash
-# Development
 helm upgrade dashboard ./helm/dashboard \
   --namespace dashboard \
-  --values helm/dashboard/values-dev.yaml
-
-# Production
-helm upgrade dashboard ./helm/dashboard \
-  --namespace dashboard \
-  --values helm/dashboard/values-production.yaml
+  --values helm/dashboard/values.yaml \
+  --values helm/dashboard/values-secrets.yaml
 ```
-
-## Switching Between External LLM and Local Model
-
-### To use External LLM:
-```yaml
-modelStrategy:
-  externalLLM:
-    enabled: true      # ← Enable external LLM
-  phiSqlLora:
-    enabled: false     # ← Disable local model
-```
-
-### To use Local Phi-4 LoRA:
-```yaml
-modelStrategy:
-  externalLLM:
-    enabled: false     # ← Disable external LLM
-  phiSqlLora:
-    enabled: true      # ← Enable local model
-```
-
-**Note:** Only ONE should be enabled at a time.
 
 ## Environment Differences
 
@@ -216,12 +171,12 @@ modelStrategy:
 
 ## Migration from Old Configuration
 
-**Old structure (removed):**
-- ~~`values.yaml`~~ → Renamed to `values-dev.yaml`
-- ~~`values-local.yaml`~~ → Deleted (merged into `values-dev.yaml`)
-- `values-production.yaml` → Completely rewritten
-
-All working configuration from the old `values.yaml` has been preserved in `values-dev.yaml`.
+**Configuration Consolidation:**
+- ~~`values-dev.yaml`~~ → Merged into unified `values.yaml`
+- ~~`values-production.yaml`~~ → Merged into unified `values.yaml`
+- ~~`values-local.yaml`~~ → Deleted
+- **New:** Single `values.yaml` works for all environments
+- **New:** Public DockerHub images (no private registry needed)
 
 ## Security Notes
 
@@ -240,11 +195,8 @@ All working configuration from the old `values.yaml` has been preserved in `valu
 
 ## Troubleshooting
 
-### Backend can't reach external LLM
+### Nexus can't reach external LLM
 Check that `modelStrategy.externalLLM.enabled` is `true` and API key is correctly set.
-
-### Phi-4 LoRA pod crashing (OOMKilled)
-Increase memory limits in `modelStrategy.phiSqlLora.resources`.
 
 ### Schema service not improving results
 Ensure `services.schemaService.enabled` is `true`.

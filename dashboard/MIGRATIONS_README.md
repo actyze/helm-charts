@@ -41,14 +41,14 @@ The migration job uses Helm hooks:
 
 ## 🔧 Configuration
 
-### Development Environment (`values-dev.yaml`)
+### Development Environment
 
 ```yaml
 migrations:
   runDML: true  # Include demo data for local development
 ```
 
-### Production Environment (`values-production.yaml`)
+### Production Environment
 
 ```yaml
 migrations:
@@ -64,8 +64,8 @@ migrations:
 ```bash
 # Install with default values (DDL only)
 helm install dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-dev.yaml \
-  -f ./helm/dashboard/values-dev-secrets.yaml
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml
 
 # ✅ DDL runs automatically
 # ❌ DML skipped (no demo data)
@@ -76,8 +76,8 @@ helm install dashboard ./helm/dashboard \
 ```bash
 # Install with demo data
 helm install dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-dev.yaml \
-  -f ./helm/dashboard/values-dev-secrets.yaml \
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml \
   --set migrations.runDML=true
 
 # ✅ DDL runs automatically
@@ -89,8 +89,8 @@ helm install dashboard ./helm/dashboard \
 ```bash
 # Upgrade existing deployment and add demo data
 helm upgrade dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-dev.yaml \
-  -f ./helm/dashboard/values-dev-secrets.yaml \
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml \
   --set migrations.runDML=true
 
 # ✅ DDL migrations applied (idempotent)
@@ -102,7 +102,8 @@ helm upgrade dashboard ./helm/dashboard \
 ```bash
 # Production: NEVER include demo data
 helm install dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-production.yaml \
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml \
   --set migrations.runDML=false  # Explicit for safety
 
 # ✅ DDL only
@@ -232,7 +233,8 @@ kubectl delete job -n dashboard dashboard-db-migration
 
 # Trigger a new migration by upgrading
 helm upgrade dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-dev.yaml \
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml \
   --reuse-values
 ```
 
@@ -252,7 +254,8 @@ psql -U nexus_service -d dashboard -f 03-demo-data.sql
 ```bash
 # Dry-run to see what migrations will execute
 helm template dashboard ./helm/dashboard \
-  -f ./helm/dashboard/values-dev.yaml \
+  -f ./helm/dashboard/values.yaml \
+  -f ./helm/dashboard/values-secrets.yaml \
   --set migrations.runDML=true \
   | grep -A 20 "kind: Job"
 ```
@@ -263,8 +266,8 @@ helm template dashboard ./helm/dashboard \
 
 - `templates/postgres-init.yaml` - ConfigMap definitions
 - `templates/db-migration-job.yaml` - Migration job definition
-- `values-dev.yaml` - Development configuration
-- `values-production.yaml` - Production configuration
+- `values.yaml` - Main configuration (all environments)
+- `values-secrets.yaml` - Secrets configuration (gitignored)
 - `sql/README.md` - SQL files documentation
 
 ---

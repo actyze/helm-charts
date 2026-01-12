@@ -12,8 +12,6 @@ AI-powered analytics dashboard with Natural Language to SQL capabilities.
 - **Frontend**: React-based web interface
 - **Nexus**: FastAPI orchestration service (Python)
 - **Schema Service**: FAISS-powered schema recommendation service
-- **Backend**: Spring Boot service (Optional)
-- **Phi-SQL-LoRA**: Local T4 GPU inference service (Optional)
 - **PostgreSQL**: Primary database
 - **Trino**: Distributed SQL query engine
 
@@ -50,7 +48,8 @@ cd helm-charts
 helm install my-dashboard ./dashboard \
   --namespace actyze \
   --create-namespace \
-  --values dashboard/values-dev.yaml
+  --values dashboard/values.yaml \
+  --values dashboard/values-secrets.yaml
 ```
 
 ## Configuration
@@ -60,9 +59,9 @@ helm install my-dashboard ./dashboard \
 See [dashboard/VALUES_README.md](dashboard/VALUES_README.md) for detailed configuration options.
 
 **Key configuration files:**
-- `values-dev.yaml` - Development environment settings
-- `values-production.yaml` - Production environment settings
-- `values-dev-secrets.yaml.template` - Secrets template
+- `values.yaml` - Main configuration (works for all environments)
+- `values-secrets.yaml.template` - Secrets template
+- `values-secrets.yaml` - Your actual secrets (gitignored, not committed)
 
 ### Minimal Configuration
 
@@ -96,11 +95,13 @@ helm lint ./dashboard
 # Dry run to see what will be deployed
 helm install my-dashboard ./dashboard \
   --dry-run --debug \
-  --values dashboard/values-dev.yaml
+  --values dashboard/values.yaml \
+  --values dashboard/values-secrets.yaml
 
 # Template the chart to see rendered manifests
 helm template my-dashboard ./dashboard \
-  --values dashboard/values-dev.yaml > output.yaml
+  --values dashboard/values.yaml \
+  --values dashboard/values-secrets.yaml > output.yaml
 ```
 
 ### Upgrading Charts
