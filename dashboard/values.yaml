@@ -182,31 +182,32 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
     
-    # 🔒 Security Headers - Prevent search engine indexing and crawling
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
-      add_header X-Frame-Options "DENY" always;
-      add_header X-Content-Type-Options "nosniff" always;
-      add_header Referrer-Policy "no-referrer" always;
-      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    # 🔒 Security Headers - DISABLED (snippet annotations blocked by ingress controller)
+    # Can be added later via ingress controller ConfigMap if needed
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   add_header X-Robots-Tag "noindex, nofollow, noarchive, nosnippet" always;
+    #   add_header X-Frame-Options "DENY" always;
+    #   add_header X-Content-Type-Options "nosniff" always;
+    #   add_header Referrer-Policy "no-referrer" always;
+    #   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     
   # 🌐 Custom Domain Configuration
   hosts:
-    - host: demo.actyze.ai  # Production domain
+    - host: your-domain.com  # Change to your domain
       paths:
-        - path: /          # Frontend UI
-          pathType: Prefix
-          service: frontend
-        - path: /api       # Backend API
+        - path: /api       # Backend API (MUST come before / to avoid being caught by frontend)
           pathType: Prefix
           service: nexus
+        - path: /          # Frontend UI (catch-all, must be last)
+          pathType: Prefix
+          service: frontend
   
   # 🔒 TLS/SSL Configuration
   # Enable for HTTPS with automatic certificates from cert-manager
   tls:
-    - secretName: demo-actyze-ai-tls
+    - secretName: dashboard-tls  # Change to match your domain
       hosts:
-        - demo.actyze.ai
+        - your-domain.com  # Change to your domain
   
   # 📝 For cert-manager automatic SSL:
   # 1. Ensure cert-manager is installed in your cluster
