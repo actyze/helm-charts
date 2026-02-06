@@ -140,12 +140,13 @@ spec:
         - name: CACHE_QUERY_TTL
           value: "{{ .Values.nexus.env.cache.queryTtl | default "1800" }}"
         # Account Provisioning API Key (for external services like marketing dashboard)
-        - name: REGISTRATION_API_KEY
+        # Optional: Only needed if using external registration endpoints (e.g., marketing dashboard)
+        - name: REGISTRATION_API_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ include "dashboard.fullname" . }}-account-provisioning
               key: api-key
-              optional: false
+              optional: true
         # Enable DEBUG logging for OrchestrationService without rebuild
         - name: LOGGING_LEVEL_COM_DASHBOARD_SERVICE_ORCHESTRATIONSERVICE
           value: DEBUG
