@@ -8,92 +8,56 @@ We now have a **unified configuration** approach:
 2. **`values-secrets.yaml`** - Your secrets (gitignored, environment-specific)
 3. **`values-secrets.yaml.template`** - Template for setting up secrets
 
-## Docker Hub Setup (Private Registry)
+## Docker Image Configuration
 
-**All images are configured to always pull `latest` from your private Docker Hub repository.**
+Actyze Helm charts use **public Docker Hub images** with automatic updates:
 
-### Quick Setup
+```yaml
+nexus:
+  image:
+    repository: actyze/dashboard-nexus
+    tag: main-llm-flex
+    pullPolicy: Always  # Always pull latest from Docker Hub
 
-**1. Replace Docker Hub username in both values files:**
-**Note:** The unified values.yaml now uses public DockerHub images from the `actyze` organization:
-- `actyze/dashboard-nexus:latest`
-- `actyze/dashboard-frontend:latest`
-- `actyze/dashboard-schema-service:latest`
+frontend:
+  image:
+    repository: actyze/dashboard-frontend
+    tag: latest
+    pullPolicy: Always
 
-No private registry setup required!
-
-**2. Create private repositories on Docker Hub:**
-- Go to https://hub.docker.com/repositories
-- Create 3 private repositories:
-  - `dashboard-nexus`
-  - `dashboard-frontend`
-  - `dashboard-schema-service`
-
-**3. Build and push images:**
-```bash
-# Set your Docker Hub username
-export DOCKERHUB_USERNAME="your-username"
-
-# Login to Docker Hub
-docker login
-
-# Build and push nexus
-docker build -f nexus/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-nexus:latest .
-docker push ${DOCKERHUB_USERNAME}/dashboard-nexus:latest
-
-# Build and push frontend
-docker build -f frontend/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-frontend:latest .
-docker push ${DOCKERHUB_USERNAME}/dashboard-frontend:latest
-
-# Build and push schema service
-docker build -f schema-service/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-schema-service:latest .
-docker push ${DOCKERHUB_USERNAME}/dashboard-schema-service:latest
+schemaService:
+  image:
+    repository: actyze/dashboard-schema-service
+    tag: latest
+    pullPolicy: Always
 ```
 
-**4. Create Kubernetes secret for Docker Hub authentication:**
-```bash
-# For development (Kind cluster)
-kubectl create secret docker-registry dockerhub-secret \
-  --docker-server=docker.io \
-  --docker-username=YOUR_DOCKERHUB_USERNAME \
-  --docker-password=YOUR_DOCKERHUB_PASSWORD \
-  --docker-email=YOUR_EMAIL \
-  -n dashboard
+**Benefits:**
+- ✅ No manual image building required
+- ✅ Automatic updates with latest features and bug fixes
+- ✅ `pullPolicy: Always` ensures fresh images on every deployment
+- ✅ Consistent across all environments
 
-# For production (Azure AKS)
-kubectl create secret docker-registry dockerhub-secret \
-  --docker-server=docker.io \
-  --docker-username=YOUR_DOCKERHUB_USERNAME \
-  --docker-password=YOUR_DOCKERHUB_PASSWORD \
-  --docker-email=YOUR_EMAIL \
-  -n dashboard \
-  --context=your-production-cluster
+**Docker Hub Repositories:**
+- https://hub.docker.com/r/actyze/dashboard-nexus
+- https://hub.docker.com/r/actyze/dashboard-frontend
+- https://hub.docker.com/r/actyze/dashboard-schema-service
+
+### Updating to Latest Images
+
+With `pullPolicy: Always`, simply restart your deployments to pull the latest images:
+
+```bash
+# Restart individual services to pull latest images
+kubectl rollout restart deployment/dashboard-nexus -n actyze
+kubectl rollout restart deployment/dashboard-frontend -n actyze
+kubectl rollout restart deployment/dashboard-schema-service -n actyze
+
+# Or restart all services
+kubectl rollout restart deployment -n actyze
 ```
 
-**5. Deploy with Helm:**
-```bash
-# Now Helm will always pull the latest images from your private Docker Hub
-helm upgrade --install dashboard ./helm/dashboard \
-  --namespace dashboard \
-  --create-namespace \
-  --values helm/dashboard/values-dev.yaml
-```
-
-### Updating Images (No Helm Changes Needed!)
-
-**Every time you build a new image, just push it:**
-```bash
-# Build new version
-docker build -f nexus/Dockerfile -t ${DOCKERHUB_USERNAME}/dashboard-nexus:latest .
-
-# Push to Docker Hub (overwrites latest tag)
-docker push ${DOCKERHUB_USERNAME}/dashboard-nexus:latest
-
-# Restart pods to pull new image
-kubectl rollout restart deployment dashboard-nexus -n dashboard
-```
-
-**Helm values never need updating!** The `latest` tag and `pullPolicy: Always` ensure fresh images every time.
+No Helm upgrade needed! The images are automatically pulled fresh each time a pod starts.
 
 ## Model Strategy - Choose ONE
 
@@ -164,7 +128,7 @@ helm upgrade dashboard ./helm/dashboard \
 
 ### Quick Start - Local Development
 
-By default, the Ingress is configured for local Kind cluster access:
+By default, the Ingress is configured for local Kubernetes cluster access:
 ```yaml
 ingress:
   enabled: true
