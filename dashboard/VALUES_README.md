@@ -33,10 +33,10 @@ schemaService:
 ```
 
 **Benefits:**
-- ✅ No manual image building required
-- ✅ Automatic updates with latest features and bug fixes
-- ✅ `pullPolicy: Always` ensures fresh images on every deployment
-- ✅ Consistent across all environments
+- No manual image building required
+- Automatic updates with latest features and bug fixes
+- `pullPolicy: Always` ensures fresh images on every deployment
+- Consistent across all environments
 
 **Docker Hub Repositories:**
 - https://hub.docker.com/r/actyze/dashboard-nexus
@@ -74,10 +74,10 @@ modelStrategy:
 ```
 
 **Benefits:**
-- ✅ No local GPU/CPU required
-- ✅ Latest models (GPT-4, Claude, Perplexity)
-- ✅ Pay-per-use pricing
-- ✅ Instant updates to newer models
+- No local GPU/CPU required
+- Latest models (GPT-4, Claude, Perplexity)
+- Pay-per-use pricing
+- Instant updates to newer models
 
 ## Optional Services
 
@@ -124,7 +124,7 @@ helm upgrade dashboard ./helm/dashboard \
 
 ---
 
-## 🌐 Custom Domain Configuration
+## Custom Domain Configuration
 
 ### Quick Start - Local Development
 
@@ -391,11 +391,11 @@ curl https://analytics.yourcompany.com
 
 | Feature | Development | Production |
 |---------|-------------|------------|
-| **External LLM** | ✅ Enabled (default) | ✅ Enabled (default) |
+| **External LLM** | Enabled (default) | Enabled (default) |
 | **Replicas** | 1 (single instance) | 3-10 (HA + autoscaling) |
-| **Demo Data** | ✅ Enabled | ❌ Disabled |
-| **Autoscaling** | ❌ Disabled | ✅ Enabled |
-| **TLS/HTTPS** | ❌ Optional | ✅ Required |
+| **Demo Data** | Enabled | Disabled |
+| **Autoscaling** | Disabled | Enabled |
+| **TLS/HTTPS** | Optional | Required |
 | **Resource Limits** | Low (dev cluster) | High (production) |
 
 ## Migration from Old Configuration
@@ -409,7 +409,7 @@ curl https://analytics.yourcompany.com
 
 ## Security Notes
 
-⚠️ **Production Security Checklist:**
+**Production Security Checklist:**
 
 1. **Never commit API keys** to version control
 2. **Use Kubernetes secrets** for sensitive data:
