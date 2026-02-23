@@ -163,6 +163,16 @@ See [Operational Configuration Guide](https://docs.actyze.io/docs/deployment/hel
 
 Connect Actyze to your preferred AI provider with simple configuration.
 
+**🌟 Powered by LiteLLM**
+
+Actyze supports **100+ AI providers** through [LiteLLM](https://docs.litellm.ai/) integration - from major cloud providers to local open-source models.
+
+**📚 See All Supported Providers:**
+- **[AI Providers Documentation](https://docs.actyze.io/docs/features/ai-providers)** - Complete list of 100+ providers
+- **[LiteLLM Providers](https://docs.litellm.ai/docs/providers)** - Official provider documentation
+
+---
+
 **Direct Connection** (Recommended for most organizations)
 
 ```yaml
