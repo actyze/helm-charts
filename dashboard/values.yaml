@@ -134,6 +134,8 @@ nexus:
       queryTtl: 1800           # Match .env: CACHE_QUERY_TTL=1800
       llmMaxSize: 200
       llmTtl: 7200
+    # Preferred Tables Configuration
+    maxPreferredTables: 25     # Maximum tables a user can mark as preferred (editable default)
     # External Services
     schemaService:
       url: "http://dashboard-schema-service:8001"

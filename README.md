@@ -360,7 +360,7 @@ kubectl delete namespace actyze
 - FAISS-based intelligent schema recommendations
 - CSV/Excel file upload for ad-hoc analysis
 - Role-Based Access Control (Admin, User, Read-Only)
-- Schema boosting (user-defined table preferences)
+- Preferred tables (user-curated table priority list with full metadata sent to LLM)
 - Organization-level metadata descriptions
 - Query caching for performance and cost optimization
 - Multi-database federation via Trino

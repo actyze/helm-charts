@@ -325,6 +325,44 @@ frontend:
 
 ---
 
+## Preferred Tables Configuration
+
+### Overview
+
+Preferred tables allow each user to mark up to `maxPreferredTables` tables for AI prioritization. The LLM receives full column metadata and descriptions for these tables on every query, using them above regular schema recommendations.
+
+### Setting the Limit
+
+In `values.yaml` under `nexus.env`:
+
+```yaml
+nexus:
+  env:
+    maxPreferredTables: 25   # Editable default — increase with caution (see token budget below)
+```
+
+The value is injected as `MAX_PREFERRED_TABLES` into the Nexus container environment.
+
+### Token Budget Guidance
+
+Each preferred table adds its column list and metadata descriptions to the LLM prompt. Higher limits require more tokens:
+
+| `maxPreferredTables` | Recommended `maxTokens` (`EXTERNAL_LLM_MAX_TOKENS`) |
+|----------------------|-----------------------------------------------------|
+| 10–25 (default)      | 4096 (default)                                      |
+| 26–40                | 6000                                                |
+| 41–50                | 8000                                                |
+
+Adjust `maxTokens` in `values.yaml`:
+
+```yaml
+modelStrategy:
+  externalLLM:
+    maxTokens: 4096   # Increase if raising maxPreferredTables above 25
+```
+
+---
+
 ## Performance Tuning
 
 ### Cache Configuration
