@@ -92,10 +92,10 @@ Production deployments require proper configuration of:
 - Metadata cache (256Mi-1Gi)
 
 **Timeout Configuration:**
-- SQL execution: 60-300 seconds
-- LLM API calls: 60-120 seconds
-- Trino queries: 120-600 seconds
-- Ingress timeouts: 120-300 seconds
+- SQL execution: 120-300 seconds (`EXECUTE_TIMEOUT_SECONDS` — also sets frontend HTTP timeout to this value + 30s)
+- LLM API calls: 120 seconds (`EXTERNAL_LLM_TIMEOUT`)
+- Trino queries: 300-600 seconds (hard upper limit, separate from execution timeout)
+- Ingress timeouts: must be ≥ `EXECUTE_TIMEOUT_SECONDS` + 60s to avoid ingress dropping long queries
 
 **Connection Pools:**
 - 20-50 connections per Nexus replica

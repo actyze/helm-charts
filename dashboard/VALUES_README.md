@@ -402,21 +402,24 @@ Configure timeouts for different operations:
 
 ```yaml
 timeouts:
-  # SQL execution timeout
-  sqlExecution: 300  # 5 minutes
+  # SQL execution timeout (controls Trino query + frontend HTTP timeout)
+  # Frontend Axios timeout = sqlExecution + 30s buffer to prevent premature disconnects
+  sqlExecution: 120  # 2 minutes — increase for slow enterprise Trino clusters
   
   # LLM API call timeout
-  llmApi: 60  # 1 minute
+  llmApi: 120  # 2 minutes
   
-  # Trino query timeout
+  # Trino query timeout (hard upper limit, separate from sqlExecution)
   trino: 600  # 10 minutes
   
-  # Ingress timeout
+  # Ingress timeout — must be ≥ sqlExecution + buffer
   ingress:
     connect: 60
     send: 600
     read: 600
 ```
+
+> **Frontend HTTP timeout:** The frontend Axios HTTP timeout is automatically set to `EXECUTE_TIMEOUT_SECONDS + 30` seconds. Always ensure your ingress `proxy-read-timeout` is at least as large as `sqlExecution + 60` to prevent the ingress layer from dropping long-running queries before the response arrives.
 
 ### Database Connection Pools
 

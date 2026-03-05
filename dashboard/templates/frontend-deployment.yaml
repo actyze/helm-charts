@@ -20,6 +20,9 @@ spec:
       - name: frontend
         image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        # Note: REACT_APP_* vars are baked in at image build time (not runtime).
+        # To change execute timeout, rebuild the image with REACT_APP_EXECUTE_TIMEOUT_SECONDS build arg.
+        # The backend (nexus) TRINO_EXECUTE_TIMEOUT_SECONDS is the authoritative runtime override.
         ports:
         - name: http
           containerPort: 80

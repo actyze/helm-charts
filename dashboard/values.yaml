@@ -59,7 +59,7 @@ modelStrategy:
     # apiKey loaded from secret: dashboard-external-llm
     maxTokens: 4096            # Match .env: EXTERNAL_LLM_MAX_TOKENS=4096
     temperature: 0.1
-    timeout: 30
+    timeout: 120               # LLM API call timeout in seconds (increase for slow providers like Bedrock)
     fallbackToLocal: false
     
     # Authentication configuration (provider-specific)
@@ -148,7 +148,8 @@ nexus:
     # SQL Execution Configuration
     sqlExecution:
       defaultMaxResults: 100
-      defaultTimeoutSeconds: 30
+      defaultTimeoutSeconds: 120    # Overall NL→SQL pipeline timeout in seconds
+      trinoExecuteTimeoutSeconds: 120  # Trino SQL execution timeout in seconds (increase for slow/large queries)
     # LLM Configuration
     externalLlm:
       enabled: true

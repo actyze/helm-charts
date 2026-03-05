@@ -133,7 +133,11 @@ spec:
         - name: SQL_EXECUTION_DEFAULT_MAX_RESULTS
           value: "{{ .Values.nexus.env.sqlExecution.defaultMaxResults | default "100" }}"
         - name: SQL_EXECUTION_DEFAULT_TIMEOUT_SECONDS
-          value: "{{ .Values.nexus.env.sqlExecution.defaultTimeoutSeconds | default "30" }}"
+          value: "{{ .Values.nexus.env.sqlExecution.defaultTimeoutSeconds | default "120" }}"
+        - name: DEFAULT_TIMEOUT_SECONDS
+          value: "{{ .Values.nexus.env.sqlExecution.defaultTimeoutSeconds | default "120" }}"
+        - name: TRINO_EXECUTE_TIMEOUT_SECONDS
+          value: "{{ .Values.nexus.env.sqlExecution.trinoExecuteTimeoutSeconds | default "120" }}"
         # Cache Configuration
         - name: CACHE_ENABLED
           value: "{{ .Values.nexus.env.cache.enabled | default "true" }}"
