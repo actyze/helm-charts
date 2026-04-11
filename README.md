@@ -360,6 +360,7 @@ kubectl delete namespace actyze
 - FAISS-based intelligent schema recommendations
 - CSV/Excel file upload for ad-hoc analysis
 - Role-Based Access Control (Admin, User, Read-Only)
+- Scheduled KPIs (gold layer) — pre-aggregate metrics on a 1-24h schedule as real queryable tables
 - Preferred tables (user-curated table priority list with full metadata sent to LLM)
 - Organization-level metadata descriptions
 - Query caching for performance and cost optimization
