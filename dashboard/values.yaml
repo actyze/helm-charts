@@ -136,6 +136,9 @@ nexus:
       llmTtl: 7200
     # Preferred Tables Configuration
     maxPreferredTables: 25     # Maximum tables a user can mark as preferred (editable default)
+    # Semantic Relationship Graph
+    relationshipGraph:
+      enabled: true            # Enable graph-backed JOIN resolution (falls back to inference when off)
     # External Services
     schemaService:
       url: "http://dashboard-schema-service:8001"

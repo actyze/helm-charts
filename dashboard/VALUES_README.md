@@ -363,6 +363,39 @@ modelStrategy:
 
 ---
 
+## Semantic Relationship Graph
+
+The relationship graph stores verified table-to-table JOIN relationships in PostgreSQL and provides them to the LLM during SQL generation. This replaces column-name guessing with persistent, ranked relationship data.
+
+### Configuration
+
+```yaml
+# values.yaml
+nexus:
+  env:
+    relationshipGraph:
+      enabled: true   # Set to false to disable (falls back to column-name inference)
+```
+
+### Population Methods
+
+| Method | How It Works | Confidence |
+|--------|-------------|------------|
+| Convention inference | Detects `*_id`/`*_uuid`/`*_fk` patterns automatically | 0.4–0.6 |
+| Query history mining | Parses JOINs from successful past SQL queries | 0.5–0.9 |
+| Admin curation | Manual creation via Data Intelligence → Relationships UI | 1.0 |
+
+### Management
+
+Access **Data Intelligence → Relationships** in the UI to:
+- View all discovered relationships with confidence scores
+- Verify correct relationships (boosts to 100% confidence)
+- Disable incorrect ones (soft delete)
+- Trigger Auto-Infer or Mine History background jobs
+- Manually create relationships with join conditions
+
+---
+
 ## Performance Tuning
 
 ### Cache Configuration

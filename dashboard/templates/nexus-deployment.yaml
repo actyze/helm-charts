@@ -148,6 +148,9 @@ spec:
         # Preferred Tables Configuration
         - name: MAX_PREFERRED_TABLES
           value: "{{ .Values.nexus.env.maxPreferredTables | default "50" }}"
+        # Semantic Relationship Graph
+        - name: RELATIONSHIP_GRAPH_ENABLED
+          value: "{{ .Values.nexus.env.relationshipGraph.enabled | default true }}"
         # Account Provisioning API Key (for external services like marketing dashboard)
         # Optional: Only needed if using external registration endpoints (e.g., marketing dashboard)
         - name: REGISTRATION_API_TOKEN
