@@ -432,6 +432,56 @@ monitoring:
     enabled: true
 
 # ============================================================================
+# PREDICTIVE INTELLIGENCE - ML Prediction Workers
+# ============================================================================
+# Per-model Docker images with independent enable/disable.
+# XGBoost + LightGBM enabled by default (tabular predictions).
+# AutoGluon disabled by default (enable with helm upgrade for time-series forecasting).
+#
+# Enable workers:
+#   helm upgrade dashboard ./dashboard --set predictionWorker.models.autogluon.enabled=true
+#
+# Scale up:
+#   helm upgrade dashboard ./dashboard --set predictionWorker.models.xgboost.resources.limits.cpu=8
+predictionWorker:
+  enabled: true
+  models:
+    xgboost:
+      enabled: true
+      image: actyze/prediction-worker-xgboost:latest
+      replicas: 0          # 0 = on-demand (scale up when needed)
+      resources:
+        limits:
+          cpu: "2"
+          memory: "1Gi"
+        requests:
+          cpu: "500m"
+          memory: "256Mi"
+    lightgbm:
+      enabled: true
+      image: actyze/prediction-worker-lightgbm:latest
+      replicas: 0
+      resources:
+        limits:
+          cpu: "2"
+          memory: "1Gi"
+        requests:
+          cpu: "500m"
+          memory: "256Mi"
+    autogluon:
+      enabled: false        # Enable: helm upgrade --set predictionWorker.models.autogluon.enabled=true
+      image: actyze/prediction-worker-autogluon:latest
+      replicas: 0
+      preset: "fast_training"   # fast_training (CPU) | medium_quality | best_quality (GPU)
+      resources:
+        limits:
+          cpu: "4"
+          memory: "6Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+
+# ============================================================================
 # PRODUCTION RECOMMENDATIONS
 # ============================================================================
 # 1. Set ingress.tls and configure cert-manager for HTTPS
