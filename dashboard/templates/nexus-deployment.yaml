@@ -151,6 +151,15 @@ spec:
         # Semantic Relationship Graph
         - name: RELATIONSHIP_GRAPH_ENABLED
           value: "{{ .Values.nexus.env.relationshipGraph.enabled | default true }}"
+        # Predictive Intelligence
+        - name: PREDICTION_ENABLED
+          value: "{{ .Values.predictionWorker.enabled | default true }}"
+        - name: PREDICTION_WORKER_XGBOOST_URL
+          value: "http://prediction-worker-xgboost:8400"
+        - name: PREDICTION_WORKER_LIGHTGBM_URL
+          value: "http://prediction-worker-lightgbm:8400"
+        - name: PREDICTION_WORKER_AUTOGLUON_URL
+          value: "http://prediction-worker-autogluon:8400"
         # Account Provisioning API Key (for external services like marketing dashboard)
         # Optional: Only needed if using external registration endpoints (e.g., marketing dashboard)
         - name: REGISTRATION_API_TOKEN
