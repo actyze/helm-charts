@@ -1,6 +1,26 @@
 # Actyze Helm Charts
 
-Production-ready Helm charts for deploying Actyze on Kubernetes.
+Production-ready Helm charts for deploying [Actyze](https://github.com/actyze/dashboard) on Kubernetes — the open-source AI-native analytics platform.
+
+[![License: AGPL v3](https://img.shields.io/github/license/actyze/helm-charts)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/actyze/helm-charts?style=social)](https://github.com/actyze/helm-charts/stargazers)
+[![Latest Release](https://img.shields.io/github/v/release/actyze/helm-charts?display_name=tag&include_prereleases)](https://github.com/actyze/helm-charts/releases)
+[![Helm](https://img.shields.io/badge/helm-3.x-blue?logo=helm)](https://helm.sh/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-1.24%2B-blue?logo=kubernetes)](https://kubernetes.io/)
+
+[Main repo](https://github.com/actyze/dashboard) · [Docker Compose](https://github.com/actyze/dashboard-docker) · [Documentation](https://docs.actyze.io) · [Website](https://actyze.ai)
+
+---
+
+## Who this is for
+
+Actyze is built for three teams:
+
+- **Teams already running Trino.** The AI/BI layer your federation has been missing — natural-language queries, dashboards, and ML predictions on top of the catalogs you already have.
+- **Metabase or Superset users.** Add NL queries and no-code ML predictions without ripping out your stack.
+- **Cortex / Genie escapees.** Same AI capabilities — text-to-SQL, semantic understanding, predictions — on your own infrastructure, no per-credit pricing, no vendor lock-in.
+
+AGPL v3, fully self-hosted, your data never leaves your network.
 
 ## Overview
 
@@ -371,19 +391,16 @@ See [Features Overview](https://docs.actyze.io/docs/features/overview) for detai
 ## Support
 
 - **Documentation**: https://docs.actyze.io
+- **Website**: https://actyze.ai
 - **GitHub Issues**: https://github.com/actyze/helm-charts/issues
 - **Docker Hub**: https://hub.docker.com/u/actyze
-- **Main Project**: https://github.com/actyze/dashboard-docker
+- **Main Project**: https://github.com/actyze/dashboard
 
 ## Related Repositories
 
-- **Dashboard Docker**: https://github.com/actyze/dashboard-docker (Local development)
-- **Documentation**: https://github.com/actyze/dashboard-marketing (Documentation site)
+- **[actyze/dashboard](https://github.com/actyze/dashboard)** — primary monorepo (frontend, Nexus API, schema service)
+- **[actyze/dashboard-docker](https://github.com/actyze/dashboard-docker)** — Docker Compose deployment for local / single-host installs
 
 ## License
 
-Proprietary - Actyze Analytics Platform
-
----
-
-**Built for production. Optimized for performance. Ready to scale.**
+[AGPL-3.0-or-later](./LICENSE)
