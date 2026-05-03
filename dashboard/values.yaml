@@ -449,7 +449,7 @@ predictionWorker:
     xgboost:
       enabled: true
       image: actyze/prediction-worker-xgboost:latest
-      replicas: 0          # 0 = on-demand (scale up when needed)
+      replicas: 1          # always-on (no scale-to-zero infra wired up)
       resources:
         limits:
           cpu: "2"
@@ -460,7 +460,7 @@ predictionWorker:
     lightgbm:
       enabled: true
       image: actyze/prediction-worker-lightgbm:latest
-      replicas: 0
+      replicas: 1
       resources:
         limits:
           cpu: "2"
@@ -471,7 +471,7 @@ predictionWorker:
     autogluon:
       enabled: false        # Enable: helm upgrade --set predictionWorker.models.autogluon.enabled=true
       image: actyze/prediction-worker-autogluon:latest
-      replicas: 0
+      replicas: 1
       preset: "fast_training"   # fast_training (CPU) | medium_quality | best_quality (GPU)
       resources:
         limits:
