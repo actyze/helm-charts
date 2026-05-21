@@ -131,3 +131,48 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Shared database env block for prediction workers.
+Workers connect to Trino (to read training data) and Postgres (to write
+predictions back to prediction_data.*). Credentials live in the same
+secrets nexus uses.
+*/}}
+{{- define "dashboard.predictionWorker.dbEnv" -}}
+- name: TRINO_HOST
+  value: "{{ .Values.nexus.env.trino.host }}"
+- name: TRINO_PORT
+  value: "{{ .Values.nexus.env.trino.port }}"
+- name: TRINO_CATALOG
+  value: "{{ .Values.nexus.env.trino.catalog }}"
+- name: TRINO_SCHEMA
+  value: "{{ .Values.nexus.env.trino.schema }}"
+- name: TRINO_SSL
+  value: "{{ .Values.nexus.env.trino.ssl | default "false" }}"
+- name: TRINO_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "dashboard.fullname" . }}-trino-credentials
+      key: username
+- name: TRINO_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "dashboard.fullname" . }}-trino-credentials
+      key: password
+- name: POSTGRES_HOST
+  value: "{{ .Values.nexus.env.postgres.host }}"
+- name: POSTGRES_PORT
+  value: "{{ .Values.nexus.env.postgres.port }}"
+- name: POSTGRES_DATABASE
+  value: "{{ .Values.nexus.env.postgres.database }}"
+- name: POSTGRES_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "dashboard.fullname" . }}-postgres-credentials
+      key: username
+- name: POSTGRES_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "dashboard.fullname" . }}-postgres-credentials
+      key: password
+{{- end }}

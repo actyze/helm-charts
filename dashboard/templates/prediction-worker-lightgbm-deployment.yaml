@@ -27,6 +27,8 @@ spec:
         - name: http
           containerPort: 8400
           protocol: TCP
+        env:
+        {{- include "dashboard.predictionWorker.dbEnv" . | nindent 8 }}
         resources:
           {{- toYaml .Values.predictionWorker.models.lightgbm.resources | nindent 10 }}
         livenessProbe:
